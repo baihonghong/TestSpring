@@ -1,6 +1,6 @@
 package jmh;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
