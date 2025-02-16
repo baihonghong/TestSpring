@@ -1,14 +1,11 @@
 package taco.tacos;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
-import taco.controller.HomeController;
 
-@WebMvcTest(HomeController.class)//Spring Boot 提供的⼀个特殊测试注释，它安排测试在Spring MVC 应⽤程序的上下⽂中运⾏
+//@WebMvcTest(HomeController.class)//Spring Boot 提供的⼀个特殊测试注释，它安排测试在Spring MVC 应⽤程序的上下⽂中运⾏
 public class HomeControllerTest {
-    @Autowired
+//    @Autowired
     private MockMvc mockMvc;//测试类被注⼊了⼀个 MockMvc 对象中，以此⽤来测试来驱动模型。
 
     /**

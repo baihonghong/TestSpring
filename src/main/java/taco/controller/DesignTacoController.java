@@ -3,13 +3,12 @@ package taco.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
 import taco.model.Ingredient;
 import taco.model.Taco;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +23,7 @@ import java.util.stream.Collectors;
  * 补充：request.getAttribute("")的scope为request，也就是在当前请求，从控制器到jsp携带的ModelMap对象中获取，而session.getAattribute("")的scope为session，是从Session中去获取属性值。
  * 注意：@SessionAttributes注解只能使用在类上，用于在多个请求之间传递参数，类似于Session的Attribute，但不完全一样，一般来说@SessionAttributes设置的参数只用于暂时的传递（存入sessionAttributeStore），
  * 而不是长期的保存，长期保存的数据还是要放到Session中。
+ *
  * @ModelAttribute是Spring框架中的一个注解，它可以用于方法或方法的参数上。这个注解的主要作用是将方法的参数或返回值绑定到一个命名的模型属性上，并传递给Web视图。
  * @ModelAttribute**注解用于方法上时，这个方法会在控制器的任何其他请求处理方法之前被调用。这意味着你可以在这个方法中初始化一些模型属性，这些属性之后会被多个请求处理方法所使用。
  * @ModelAttribute**注解用于方法参数上时，Spring会尝试从模型中获取与参数名称相匹配的属性。如果找到了，它就会将该属性传递给方法；如果没有找到，它会查看请求中是否有匹配的参数，并尝试创建和填充对象。
@@ -53,11 +53,40 @@ public class DesignTacoController {
                     filterByType(ingredients, type));
         }
     }
-    @GetMapping("/design")
+
+    /**
+     * 用于访问design.html
+     *
+     * @param model
+     * @return
+     */
+    @GetMapping("")
     public String showDesignForm(Model model) {
-        model.addAttribute("taco", new Taco());
+        Object wrap = model.getAttribute("wrap");
+        model.addAttribute("design", new Taco());
         return "design";
     }
+
+    /**
+     * design.html <form> 没有声明 action 属性。这意味着在提交表单
+     * 时，浏览器将收集表单中的所有数据，并通过 HTTP POST 请求将其
+     * 发送到服务器，发送到显⽰表单的 GET 请求的同⼀路径 ——/design 路径。
+     * @Valid 注解告诉 Spring MVC 在提交的 Taco 对象绑定到提交的表单
+     * 数据之后，以及调⽤ processDesign() ⽅法之前，对提交的 Taco 对
+     * 象执⾏验证。如果存在任何验证错误，这些错误的详细信息将在传递
+     * 到 processDesign() 的错误对象中捕获。
+     * @param taco
+     * @return
+     */
+    @PostMapping
+    public String processTaco(@Valid @ModelAttribute("design") Taco taco, Errors errors) {
+        if (errors.hasErrors()) {
+            return "design";
+        }
+        log.info("Processing taco: " + taco);
+        return "redirect:/orders/current";
+    }
+
     private Iterable<Ingredient> filterByType(
             List<Ingredient> ingredients, Ingredient.Type type) {
         return ingredients
